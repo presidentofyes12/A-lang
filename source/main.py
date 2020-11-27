@@ -3,19 +3,36 @@
 ################
 def throw(reason):
     print("Error: " + reason)
+vardict = {}
+varnames = []
+commandnames = ["write", "use", "execute", "getinput", "var"]
 def parser(code):
-    code = code.split()
+    global varnames
+    global vardict
+    thing1 = code.split("\"")
+    thing2 = code.split("'")
+    code = code.split(" ")
     first = code[0]
+    second = code[1]
     fullstatement = ""
-    for i in code:
-        print
     if first == "write":
         if len(code) > 2:
             if code[1] == "statement":
-                print(code[2])
+                try:
+                    print(thing1[1])
+                except:
+                    throw("No quotations")
             elif code[1] == "file":
-                with open(code[2], 'r') as fin:
-                    print(fin.read())
+                try:
+                    with open(code[2], 'r') as fin:
+                        print(fin.read())
+                except FileNotFoundError:
+                    throw("File " + code[2] + " doesn't exist")
+            elif code[1] == "variable":
+                if code[2] in varnames:
+                    print(vardict[code[2]])
+                else:
+                    throw("The variable " + code[2] + " doesn't exist")
             else:
                 throw(second + " not a valid output type")
         elif len(code) < 2:
@@ -30,28 +47,53 @@ def parser(code):
             throw(code[1] + " doesn't exist")
     elif first == "getinput":
         x = input()
-        print(x)
+    elif first == "var":
+        if code[2] == "=":
+            if code[3] == "getinput":
+                x = input()
+                vardict.update({code[1]: x})
+                varnames.append(code[1])
+            else:
+                vardict.update({code[1]: code[3]})
+                varnames.append(code[1])
+        else:
+            pass # will throw error
+    elif len(code) == 1 and first in varnames:
+        print(first)
+    else:
+        pass
 def commentornot(statement, execution1, execution2):
-    statement = statement.split()
+    statement = statement.split(" ")
 ##################
 ## The Compiler ##
 ##################
 print("Welcome to the A compiler.")
 while True:
-    myline = input(">> ")
-    if len(myline) < 1:
-       continue
-    if myline != "end":
-        if "write" in myline or "execute" in myline or "use" in myline or "getinput" in myline:
-            parser(myline)
-            continue
-        elif myline == "quit":
-            print("Use 'end' to quit the interpreter")
-        else:
-            if myline.split()[0] == "//":
+    try:
+        myline = input(">> ")
+        if len(myline) < 1:
+           continue
+        if myline != "end":
+            if myline.split()[0] in commandnames:
+                parser(myline)
                 continue
-            else: throw(myline + " not a valid statement")
-    elif myline == "end":
-        break
-    else:
-        throw(myline + " not a valid statement")
+            elif myline == "quit":
+                print("Use 'end' to quit the interpreter")
+            elif myline in varnames:
+                print(vardict[myline])
+            else:
+                if myline.split()[0] == "//":
+                    continue
+                else: throw(myline + " not a valid statement")
+        elif myline == "end":
+            break
+        else:
+            throw(myline + " not a valid statement")
+    except KeyboardInterrupt:
+        print("would you like to quit?")
+        yesorno = input(">")
+        if yesorno == "y":
+            break
+        elif yesorno == "n":
+            print("Ok.")
+            continue
