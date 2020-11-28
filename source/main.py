@@ -13,7 +13,8 @@ def parser(code):
     thing2 = code.split("'")
     code = code.split(" ")
     first = code[0]
-    second = code[1]
+    if len(code) > 1:
+        second = code[1]
     fullstatement = ""
     if first == "write":
         if len(code) > 2:
@@ -33,6 +34,10 @@ def parser(code):
                     print(vardict[code[2]])
                 else:
                     throw("The variable " + code[2] + " doesn't exist")
+            elif code[1] == "getinput":
+                print(input())
+            elif code[1] == "equation":
+                print(eval(thing1[1]))
             else:
                 throw(second + " not a valid output type")
         elif len(code) < 2:
@@ -42,7 +47,10 @@ def parser(code):
     elif first == "use":
         try:
             with open(code[1] + ".a", 'r') as fin:
-                parser(fin.read())
+                fullfile = fin.read().split("\n")
+                for i in range(0, len(fullfile)):
+                    parser(fullfile[i])
+                # parser(fin.read())
         except FileNotFoundError:
             throw(code[1] + " doesn't exist")
     elif first == "getinput":
