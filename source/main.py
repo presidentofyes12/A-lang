@@ -19,6 +19,11 @@ could boi = 4
 3. Equations [done]
 4. vectors? []
 """
+"""
+Some nifty stuff:
+elif myline == "rules":
+                print("Rules for A:\n1: When writing a value, you must specify what value you want to print out. For example, if you want to print \"Hello World\", you say:\nwrite statement \"hello\".")
+"""
 ################
 ## The Parser ##
 ################
@@ -28,10 +33,19 @@ def throw(reason):
     print("Error: " + reason)
 vardict = {}
 varnames = []
-commandnames = ["write", "use", "execute", "getinput", "var", "func"]
+commandnames = ["write", "use", "execute", "getinput", "var", "func", "typeof"]
 importedlibraries = {}
 libnames = []
+
 def parser(code):
+    def iserror(func, *args, **kw):
+        # credit to @Martijn Pieters on Stack Overflow for providing me with this code, from the question linked here:
+        # https://stackoverflow.com/questions/34793339/true-if-a-function-works-and-false-if-a-function-gives-an-error
+        try:
+            func(*args, **kw)
+            return False
+        except Exception:
+            return True
     global varnames
     global vardict
     global importedlibraries
@@ -65,7 +79,7 @@ def parser(code):
                 try:
                     print(thing1[1])
                 except:
-                    throw("No quotations")
+                    throw("No quotations") #try and remove this some day
             elif code[1] == "file":
                 try:
                     with open(code[2], 'r') as fin:
@@ -151,10 +165,27 @@ def parser(code):
                                 if isequation(vareq[1]):
                                     vardict.update({code[1]: eval(vareq[1])})
                                     varnames.append(code[1])# is equation?
+                                elif code[3] == "true" or code[3] == "false":
+                                    varnames.append(code[1])
+                                    vardict.update({code[1]: code[3]})
                                 else:
                                     throw(code[3] + " isn't a variable")
         else:
             pass # will throw error
+    elif first == "typeof":
+        isntint = iserror(int, vardict[code[1]])
+        isntfloat = iserror(float, vardict[code[1]])
+        if code[1] in varnames:
+            if type(vardict[code[1]]) == str and not vardict[code[1]] == "true" and not vardict[code[1]] == "false":
+                print("type: string")
+            elif type(vardict[code[1]]) == int:
+                print("type: integer")
+            elif type(vardict[code[1]]) == float:
+                print("type: float")
+            elif vardict[code[1]] == "true" or vardict[code[1]] == "false":
+                print("type: boolean")
+            else:
+                print("Error: error in parser, please ask a Stack Overflow question or begin a Github issue on A's page")
     elif first == "func":
         pass
     elif len(code) == 1 and first in varnames:
