@@ -23,6 +23,11 @@ could boi = 4
 Some nifty stuff:
 elif myline == "rules":
                 print("Rules for A:\n1: When writing a value, you must specify what value you want to print out. For example, if you want to print \"Hello World\", you say:\nwrite statement \"hello\".")
+elif first == "make":
+        try:
+            f = open(code[1], "x")
+        except FileExistsError:
+            print("File already exists")
 """
 ################
 ## The Parser ##
@@ -33,7 +38,7 @@ def throw(reason):
     print("Error: " + reason)
 vardict = {}
 varnames = []
-commandnames = ["write", "use", "execute", "getinput", "var", "func", "typeof"]
+commandnames = ["write", "use", "del", "execute", "getinput", "var", "func", "typeof", "make", "writeto"]
 importedlibraries = {}
 libnames = []
 
@@ -94,7 +99,7 @@ def parser(code):
             elif code[1] == "getinput":
                 print(input())
             elif code[1] == "equation":
-                print(eval(thing1[1]))
+                print(eval(thing1[0].split("equation")[1]))
             else:
                 throw(second + " not a valid output type")
         elif len(code) < 2:
@@ -186,6 +191,12 @@ def parser(code):
                 print("type: boolean")
             else:
                 print("Error: error in parser, please ask a Stack Overflow question or begin a Github issue on A's page")
+    elif first == "writeto":
+        f = open(code[1], "a")
+        f.write(code[2])
+        f.close()
+    elif first == "del":
+        varnames.remove(code[1])
     elif first == "func":
         pass
     elif len(code) == 1 and first in varnames:
