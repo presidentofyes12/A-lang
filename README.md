@@ -1,4 +1,4 @@
 # A-lang
 
-A language that I'm making right now for no reason whatsoever
+language moment
 ![A test](/images/first-test.PNG)
